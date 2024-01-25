@@ -1,11 +1,11 @@
+import json
+import os
 import string
 import random
 from pathlib import Path
-import json
 
 class Students:
     data = []
-    
     database = "student.json"
 
     try:
@@ -22,7 +22,7 @@ class Students:
         with open(cls.database, "w") as fs:
             fs.write(json.dumps(cls.data))
         print("Updated successfully")
-        
+
     @classmethod
     def randomid(cls):
         # Generate a random ID for a student
@@ -33,17 +33,36 @@ class Students:
         random.shuffle(id)
         return "".join(id)
 
-    def RegisterStudent(self):
+    @classmethod
+    def register_student(cls):
         # Register a new student
+        json_file_path = cls.database
+
+        if not os.path.exists(json_file_path):
+            # If the file doesn't exist, create it with an empty list
+            with open(json_file_path, 'w') as file:
+                json.dump([], file)
+
+        # Get student details from the user
         stu = {
-            "id": Students.randomid(),
+            "id": cls.randomid(),
             "name": input("Tell your name: "),
             "email": input("Tell your email: "),
             "password": input("Tell your password: "),
-            "skill": input("Tell your skill: ") 
+            "skill": input("Tell your skill: ")
         }
-        Students.data.append(stu)
-        Students.UpdateStudent()
+
+        # Load existing data from the JSON file
+        with open(json_file_path, 'r') as file:
+            data = json.load(file)
+
+        # Add the new student data to the list
+        data.append(stu)
+
+        # Update the JSON file with the new data
+        with open(json_file_path, 'w') as file:
+            json.dump(data, file)
+
         print("Registered successfully")
 
     def readsinglestudent(self):
@@ -151,7 +170,7 @@ while True:
         exit(0)
 
     if n == 1:
-        randomname.RegisterStudent()
+        randomname.register_student()
 
     if n == 2:
         randomname.readsinglestudent()
